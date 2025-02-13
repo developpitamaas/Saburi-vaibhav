@@ -48,3 +48,5 @@ app.use(
 app.get("/", (req, res) => {
   res.send("Hello World!, Server is running");
 });
+
+module.exports = app;
