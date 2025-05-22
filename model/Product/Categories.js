@@ -12,6 +12,13 @@ const categorySchema = new mongoose.Schema({
     Image: {
         type: String,
     },
+      tax:{
+        type: Number,
+    },
+      availablePinCodes: {
+        type: [String], 
+        default: [],
+    },
 })
 
 // Export product category model

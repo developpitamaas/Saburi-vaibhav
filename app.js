@@ -46,7 +46,7 @@ app.use(
 
 // default route
 app.get("/", (req, res) => {
-  res.send("Hello World!, Server is running");
+  res.send("Hello vaibhav saburi!, Server is running");
 });
 
 module.exports = app;

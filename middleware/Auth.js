@@ -29,7 +29,7 @@ const IsAuthenticateUser = TryCatch(async (req, res, next) => {
     return res.status(403).json({ error: "Unauthorized access" });
   }
   const bearerToken = bearerHeader.split(" ")[1];
-  req.token = bearerToken;
+  req.token = bearerToken; 
   try {
 
     const decodeData = jwt.verify(bearerToken, process.env.JWT_SECRET);

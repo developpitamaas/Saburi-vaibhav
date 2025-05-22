@@ -1,252 +1,258 @@
-// const mongoose = require("mongoose");
-
-// // Define order schema
-// const SecondorderSchema = new mongoose.Schema({
-//   userId: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "User",
-//     required: true,
-//   },
-//   CartId: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "Cart",
-//     required: true,
-//   },
-//   shippingAddress: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "shipedaddress",
-//   },
-//   billingAddress: {
-//     type: mongoose.Schema.Types.ObjectId,
-//     ref: "billingaddress",
-//   },
-//   isPaid: {
-//     type: Boolean,
-//     required: true,
-//     default: false,
-//   },
-//   paidAt: {
-//     type: Date,
-//   },
-//   isDelivered: {
-//     type: Boolean,
-//     required: true,
-//     default: false,
-//   },
-//   deliveredAt: {
-//     type: Date,
-//   },
-//   status: {
-//     type: String,
-//     required: true,
-//     default: "Pending",
-//   },
-//   createdAt: {
-//     type: Date,
-//     default: Date.now,
-//   },
-//   // payment 
-//   transactionId: {
-//     type: String,
-//     required: true,
-//   },
-//   paymentGatewayResponse: {
-//     type: Object, 
-//     required: true,
-//   },
-//   currency: {
-//     type: String,
-//     required: true,
-//     default: "INR",
-//   },
-//   paymentIntent: {
-//     type: String,
-//   },    
-    
-//   paymentMethod: {
-//     type: String,
-//     required: true,
-//     default: "Cash On Delievery",
-//     enum: ["Cash On Delievery", "Razorpay"],
-//   },
-//   paymentResult: {
-//     id: String,
-//     status: String,
-//     update_time: String,
-//     email_address: String,
-//   },
-//   paymentId: {
-//     type: String,
-//     default: null,
-//   },
-//   trackingNumber: {
-//     type: String,
-//   },
-//   orderSource: {
-//     type: String,
-//     enum: ["Website", "Mobile App", "Third-party"],
-//   },
-//   refundStatus: {
-//     type: String,
-//     enum: ["Not Requested", "Requested", "Processed"],
-//     default: "Not Requested",
-//   },
-//   paymentConfirmation: {
-//     type: Boolean,
-//     default: false,
-//   },
-        
-
-//   // other 
-//   orderNotes: {
-//     type: String,
-//   },
-  
-//   UpdateAt: {
-//     type: Date,
-//     default: Date.now,
-//   },
-// },{timestamps:true});
-
-// // Export order model
-// module.exports = mongoose.model("Secondorder", SecondorderSchema);
-
 const mongoose = require("mongoose");
-
-const SecondorderSchema = new mongoose.Schema({
-  // Personal Information
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+// Define order schema
+const orderSchema = new mongoose.Schema(
+  {
+    user: {
+      // Changed from userId to user
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+      },
+      username: {
+        type: String,
+      },
+      email: {
+        type: String,
+      },
+      Number: {
+        type: Number,
+      },
+      userImage: {
+        type: String,
+        default:
+          "https://media.istockphoto.com/id/1131164548/vector/avatar-5.jpg?s=612x612&w=0&k=20&c=CK49ShLJwDxE4kiroCR42kimTuuhvuo2FH5y_6aSgEo=",
+      },
+      role: {
+        type: String,
+        default: "user",
+      },
+    },
+    orderItems: [
+      {
+        product: {
+          _id: {
+            type: mongoose.Schema.Types.ObjectId,
+            required: true,
+          },
+          name: {
+            type: String,
+            required: true,
+          },
+          size: {
+            type: String,
+          },
+          sizeType: {
+            type: String,
+          },
+          description: {
+            type: String,
+          },
+          mrp: {
+            type: Number,
+          },
+          price: {
+            type: Number,
+          },
+          Tax: {
+            type: Number,
+          },
+          discountPercentage: {
+            type: Number,
+          },
+          image: [
+            {
+              type: String,
+            },
+          ],
+          thumbnail: {
+            type: String,
+          },
+          category: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Category",
+          },
+          brand: {
+            type: String,
+          },
+          productType: {
+            type: String,
+          },
+        },
+        singleProductPrice: {
+          type: Number,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+        totalPrice: {
+          type: Number,
+          required: true,
+        },
+        size: {
+          size: {
+            type: String,
+          },
+          sizetype: {
+            type: String,
+          },
+        },
+        Iscoupanapplie: {
+          type: Boolean,
+          default: false,
+        },
+        Coupan: {
+          type: String,
+        },
+        CoupandiscountPercentage: {
+          type: Number,
+        },
+        PorudctpricebeforeapplyCoupan: {
+          type: Number,
+        },
+      },
+    ],
+    shippingAddress: {
+      _id: {
+        type: mongoose.Schema.Types.ObjectId,
+      },
+      userId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      fullName: {
+        type: String,
+      },
+      phoneNumber: {
+        type: String,
+      },
+      pincode: {
+        type: String,
+      },
+      state: {
+        type: String,
+      },
+      city: {
+        type: String,
+      },
+      houseNo: {
+        type: String,
+      },
+      area: {
+        type: String,
+      },
+      landmark: {
+        type: String,
+      },
+      addressType: {
+        type: String,
+        enum: ["Home", "Work", "Other"],
+        default: "Home",
+      },
+      isDefault: {
+        type: Boolean,
+        default: false,
+      },
+      createdAt: {
+        type: Date,
+        default: Date.now,
+      },
+      updatedAt: {
+        type: Date,
+        default: Date.now,
+      },
+    },
+    paymentMethod: {
+      type: String,
+      required: true,
+      default: "Cash On Delivery",
+    },
+    taxPrice: {
+      type: Number,
+      required: true,
+      default: 1.05, // 5% tax
+    },
+    priceAfterAddingTax: {
+      type: Number,
+    },
+    TotalProductPrice: {
+      type: Number,
+    },
+    shippingPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
+    totalPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
+    totalPriceWithoutDiscount: {
+      type: Number,
+    },
+    isPaid: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    paidAt: {
+      type: Date,
+    },
+    isDelivered: {
+      type: Boolean,
+      required: true,
+      default: false,
+    },
+    deliveredAt: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      required: true,
+      default: "Pending",
+    },
+    currency: {
+      type: String,
+      default: "INR",
+    },
+    paymentId: {
+      type: String,
+    },
+    paymentConfirmation: {
+      type: Boolean,
+      default: false,
+    },
+    refundStatus: {
+      type: String,
+      default: "Not Requested",
+    },
+    UserIp: {
+      type: String,
+    },
+    DeviceType: {
+      type: String,
+    },
+    orderfromURL: {
+      type: String,
+    },
+    Iscoupanapplied: {
+      type: String,
+      default: "false",
+    },
+    CoupanCode: {
+      type: String,
+    },
+    CoupanDiscount: {
+      type: Number,
+    },
+    priceafterAddingMinimumOrderValueCoupan: {
+      type: Number,
+    },
   },
- 
-  // Cart Reference
-  CartId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Cart",
-    required: true,
-  },
-  
-  // Address Information
-  shippingAddress: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "shippedaddress",
-  },
-  billingAddress: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "billingaddress",
-  },
-  
-  // Order Status
-  isPaid: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  paidAt: {
-    type: Date,
-  }, 
-  isDelivered: {
-    type: Boolean,
-    required: true,
-    default: false,
-  },
-  deliveredAt: {
-    type: Date,
-  },
-  status: {
-    type: String,
-    required: true,
-    default: "Pending",
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-
-  // Payment Details
-  transactionId: {
-    type: String,
-  },
-  paymentGatewayResponse: {
-    type: Object,
-  },
-  currency: {
-    type: String,
-    default: "INR",
-  },
-  paymentIntent: {
-    type: String,
-  },
-  paymentMethod: {
-    type: String,
-    required: true,
-    default: "Cash On Delivery",
-    enum: ["Cash On Delivery", "Razorpay"],
-  },
-  paymentResult: {
-    id: String,
-    status: String,
-    update_time: String,
-    email_address: String,
-  },
-  UserIp: {
-    type: String,
-  },
-  UserContact: {
-    type: String,
-  },
-  DeviceType: {
-    type: String,
-  },
-  paymentId: {
-    type: String,
-    default: null,
-  },
-  User_Location:{
-    type: String,
-  },
-  Geolocation: {
-    type: String,
-  },
-  paymentConfirmation: {
-    type: Boolean,
-    default: false,
-  },
-  paymentorderCratedAt: {
-    type: String,
-  },
-  paymentDoneAt: {
-    type: Date,
-  },
-  orderfromURL: {
-    type: String,
-  },
-
-  // Other Information
-  trackingNumber: {
-    type: String,
-  },
-  orderSource: {
-    type: String,
-    enum: ["Website", "Mobile App", "Third-party"],
-  },
-  refundStatus: {
-    type: String,
-    enum: ["Not Requested", "Requested", "Processed"],
-    default: "Not Requested",
-  },
-  orderNotes: {
-    type: String,
-  },
-  
-  // Timestamps
-  UpdateAt: {
-    type: Date,
-    default: Date.now,
-  },
-}, { timestamps: true });
+  { timestamps: true }
+);
 
 // Export order model
-module.exports = mongoose.model("Secondorder", SecondorderSchema);
+module.exports = mongoose.model("Order", orderSchema);
