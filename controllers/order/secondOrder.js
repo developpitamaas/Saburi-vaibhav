@@ -132,6 +132,7 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
     return res.status(404).json({ success: false, message: "User not found" });
   }
 
+  // Correct population - only populate productId and then handle sizes separately
   const cart = await Cart.findById(CartId).populate("orderItems.productId");
   if (!cart) {
     return res.status(404).json({ success: false, message: "Cart not found" });
@@ -153,30 +154,38 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
     role: user.role,
   };
 
-  const orderItems = cart.orderItems.map((item) => ({
-    product: {
-      _id: item.productId._id,
-      name: item.productId.name,
-      description: item.productId.description || "",
-      image: item.productId.image || [],
-      thumbnail: item.productId.thumbnail || "",
-      category: item.productId.category,
-      brand: item.productId.brand || "",
-      productType: item.productId.productType || "Domestic",
-      mrp: item.size.price || 0,
-      price: item.size.FinalPrice || 0,
-      discountPercentage: item.size.discountPercentage || 0,
-      sizeType: item.size.sizeType || "Regular",
-      size: item.productId.size || [],
-    },
-    singleProductPrice: item.singleProductPrice,
-    quantity: item.quantity,
-    totalPrice: item.totalPrice,
-    size: item.size,
-    Iscoupanapplie: item.Iscoupanapplie || false,
-    Coupan: item.Coupan || "",
-    CoupandiscountPercentage: item.CoupandiscountPercentage || 0,
-    PorudctpricebeforeapplyCoupan: item.PorudctpricebeforeapplyCoupan || 0,
+  // Process order items with proper size handling
+  const orderItems = await Promise.all(cart.orderItems.map(async (item) => {
+    const productSize = await Productsize.findById(item.size);
+    console.log(productSize);
+    return {
+      product: {
+        _id: item.productId._id,
+        name: item.productId.name,
+        description: item.productId.description || "",
+        image: item.productId.image || [],
+        thumbnail: item.productId.thumbnail || "",
+        category: item.productId.category,
+        brand: item.productId.brand || "",
+        productType: item.productId.productType || "Domestic",
+        mrp: productSize ? productSize.price : 0,
+        price: productSize ? productSize.FinalPrice : 0,
+        discountPercentage: productSize ? productSize.discountPercentage : 0,
+        sizeType: productSize ? productSize.sizetype : "",
+        size: productSize ? productSize.size : "", // Single size string
+      },
+      singleProductPrice: item.singleProductPrice,
+      quantity: item.quantity,
+      totalPrice: item.totalPrice,
+      size: {
+        size: productSize ? productSize.size : "",
+        sizetype: productSize ? productSize.sizeType : "Regular"
+      },
+      Iscoupanapplie: item.Iscoupanapplie || false,
+      Coupan: item.Coupan || "",
+      CoupandiscountPercentage: item.CoupandiscountPercentage || 0,
+      PorudctpricebeforeapplyCoupan: item.PorudctpricebeforeapplyCoupan || 0,
+    };
   }));
 
   const shippingAddressData = {
@@ -220,10 +229,7 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
 
   await Cart.findByIdAndUpdate(CartId, { activecart: "false" });
 
-  const userEmail = req.user.email;
-  const orderDetails = generateOrderDetails(cart);
-  const orderTotal = calculateOrderTotal(cart);
-
+  // Rest of your code remains the same...
   const updatedProducts = [];
   const lowQuantityProducts = [];
   const outOfStockProducts = [];
@@ -280,7 +286,7 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
     transaction_id: paymentId || null,
     shipping_phone: address.phonenumber,
     order_items: cart.orderItems.map((item) => ({
-      sku: `SKU_${item.productId._id}}`,
+     sku: `SKU_${item.productId._id.toString()}_${item.quantity}`,
       name: item.productId.name,
       category: item.productId.category,
       units: item.quantity,
@@ -291,13 +297,13 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
     payment_method: paymentMethod === "Razorpay" ? "Prepaid" : "COD",
     sub_total: cart.totalPrice,
     shipping_charges: 0,
-     length: 1,
+    length: 1,
     breadth: 1,
     height: 1,
     weight: 1,
   };
 
-    const shiprocketResponse = await ShiprocketData.createShiprocketOrder(
+  const shiprocketResponse = await ShiprocketData.createShiprocketOrder(
     shiprocketPayload
   );
   if (shiprocketResponse.error) {
@@ -305,7 +311,6 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
       shiprocketResponse.message || "Failed to create order on Shiprocket"
     );
   }
-
 
   if (lowQuantityProducts.length > 0) {
     let lowQuantityMessage =
@@ -417,7 +422,7 @@ const GetAllsecondOrders = TryCatch(async (req, res, next) => {
   const status = req.query.status || "Pending";
   const resultperpage = req.query.resultperpage || 10000;
   // Initialize ApiFeatures with the Order model query and the query string from the request
-  const features = new ApiFeatures(SecondorderSchema.find(), req.query)
+  const features = await new ApiFeatures(SecondorderSchema.find(), req.query)
     // Apply search functionality if 'name' is provided in the query string
     .search()
     .filterByStatus(status)

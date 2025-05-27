@@ -267,19 +267,23 @@ const GetCart = async (req, res) => {
     const cart = await Cart.findOne({ userId: req.user.id, activecart: "true" })
       .populate({
         path: "orderItems",
-        populate: {
-          path: "productId",
-          select: "name price PriceAfterDiscount discountPercentage thumbnail",
-          model: "product",
-        },
-      })
-      .populate({
-        path: "orderItems",
-        populate: {
-          path: "size",
-          model: "productsize",
-          select: "size sizetype price discountPercentage FinalPrice",
-        },
+        populate: [
+          {
+            path: "productId",
+            select: "name price PriceAfterDiscount discountPercentage thumbnail category",
+            model: "product",
+            populate: {
+              path: "category",
+              model: "category",
+              select: "name tax",
+            },
+          },
+          {
+            path: "size",
+            model: "productsize",
+            select: "size sizetype price discountPercentage FinalPrice",
+          },
+        ],
       });
 
     if (!cart) {
@@ -292,6 +296,7 @@ const GetCart = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 // Controller function to reduce the quantity of a product in the cart
 const RemoveFromCart = TryCatch(async (req, res) => {

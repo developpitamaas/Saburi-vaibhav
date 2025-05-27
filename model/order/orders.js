@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema(
   {
     user: {
-      // Changed from userId to user
       _id: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
@@ -168,14 +167,31 @@ const orderSchema = new mongoose.Schema(
       required: true,
       default: "Cash On Delivery",
     },
-    taxPrice: {
-      type: Number,
-      required: true,
-      default: 1.05, // 5% tax
-    },
-    priceAfterAddingTax: {
+
+    MRP: {
       type: Number,
     },
+    DISCOUNT: {
+      type: Number,
+    },
+    SELLINGPRICE : {
+      type: Number,
+    },
+    TAXABLEAMOUNT: {
+      type: Number,
+    },
+    TAXADDED: {
+      type: Number,
+    },
+    DELIVERYCHARGE:{
+      type: Number
+    },
+    ORDERTOTAL: {
+      type: Number,
+    },
+
+
+  
     TotalProductPrice: {
       type: Number,
     },
@@ -213,29 +229,13 @@ const orderSchema = new mongoose.Schema(
       required: true,
       default: "Pending",
     },
-    currency: {
-      type: String,
-      default: "INR",
-    },
+   
     paymentId: {
       type: String,
     },
     paymentConfirmation: {
       type: Boolean,
       default: false,
-    },
-    refundStatus: {
-      type: String,
-      default: "Not Requested",
-    },
-    UserIp: {
-      type: String,
-    },
-    DeviceType: {
-      type: String,
-    },
-    orderfromURL: {
-      type: String,
     },
     Iscoupanapplied: {
       type: String,
