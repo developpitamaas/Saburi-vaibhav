@@ -250,6 +250,9 @@ const orderSchema = new mongoose.Schema(
     priceafterAddingMinimumOrderValueCoupan: {
       type: Number,
     },
+  shiprocketOrderID : {
+      type: String,
+    }
   },
   { timestamps: true }
 );

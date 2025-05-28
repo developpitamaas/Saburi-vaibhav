@@ -306,6 +306,7 @@ const CreateSecondOrder = TryCatch(async (req, res, next) => {
   const shiprocketResponse = await ShiprocketData.createShiprocketOrder(
     shiprocketPayload
   );
+  console.log(shiprocketResponse);
   if (shiprocketResponse.error) {
     throw new Error(
       shiprocketResponse.message || "Failed to create order on Shiprocket"
